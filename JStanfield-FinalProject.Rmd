@@ -1,0 +1,64 @@
+---
+title: "JStanfield-FinalProject"
+author: "James Stanfield"
+date: "2/24/2020"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+c("flexdashboard",
+   "ggplot2",
+   "tidyverse",
+   "data.table",
+   "plotly"
+  ) -> package_names  
+
+for(package_name in package_names) {
+  if(!is.element(package_name, installed.packages()[,1])) {
+     install.packages(package_name,
+                      repos = "http://cran.mtu.edu/")
+  }
+  library(package_name, character.only=TRUE,
+          quietly=TRUE,verbose=FALSE)
+}
+
+rm(list=c("package_name", "package_names")) # clean up the environment
+```
+
+
+
+```{r}
+drug.data <- fread(file = "./drug_consumption.data.csv")
+
+str(drug.data)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
