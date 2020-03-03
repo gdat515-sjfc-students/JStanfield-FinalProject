@@ -1,0 +1,198 @@
+---
+title: "JStanfield-FinalProject"
+author: "James Stanfield"
+date: "2/24/2020"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+
+c("flexdashboard",
+   "ggplot2",
+   "tidyverse",
+   "data.table",
+   "plotly",
+   "shiny",
+   "ggthemes"
+  ) -> package_names  
+
+for(package_name in package_names) {
+  if(!is.element(package_name, installed.packages()[,1])) {
+     install.packages(package_name,
+                      repos = "http://cran.mtu.edu/")
+  }
+  library(package_name, character.only=TRUE,
+          quietly=TRUE,verbose=FALSE)
+}
+
+rm(list=c("package_name", "package_names")) # clean up the environment
+```
+
+Drug Use Data From UCI.
+======================================
+
+Row {data-width=650}
+-----------------------------------------------------------------------
+
+### Drug Use Data From UCI
+
+```{r}
+#data URL: https://archive.ics.uci.edu/ml/datasets/Drug+consumption+%28quantified%29
+
+drug.data <- fread(file = "./drug_consumption.data.csv")
+
+str(drug.data)
+```
+
+row
+-----------------------------------
+
+Cannabis Use NEO-FFI-R Scores
+======================================
+
+row 
+-----------------------------------------------------------------------
+
+```{r}
+drug.data %>%
+    ggplot(data = ., aes(y = Nscore, x = Cannabis)) + 
+    geom_boxplot(notch = TRUE) +
+    ggtitle("Cannabis Use by N-Score") +
+    theme_hc() 
+```
+
+```{r}
+drug.data %>%
+    ggplot(data = ., aes(y = Escore, x = Cannabis)) + 
+    geom_boxplot(notch = TRUE) +
+    ggtitle("Cannabis Use by E-Score") +
+    theme_hc() 
+```
+
+```{r}
+drug.data %>%
+    ggplot(data = ., aes(y = Oscore, x = Cannabis)) + 
+    geom_boxplot(notch = TRUE) +
+    ggtitle("Cannabis Use by O-Score") +
+    theme_hc() 
+```
+
+row 
+-----------------------------------------------------------------------
+
+```{r}
+drug.data %>%
+    ggplot(data = ., aes(y = Ascore, x = Cannabis)) + 
+    geom_boxplot(notch = TRUE) +
+    ggtitle("Cannabis Use by A-Score") +
+    theme_hc() 
+```
+
+```{r}
+drug.data %>%
+    ggplot(data = ., aes(y = Cscore, x = Cannabis)) + 
+    geom_boxplot(notch = TRUE) +
+    ggtitle("Cannabis Use by C-Score") +
+    theme_hc() 
+```
+
+
+row 
+-----------------------------------------------------------------------
+
+
+O-Score and C-Score by Sex
+======================================
+
+row 
+-----------------------------------------------------------------------
+
+### O-Score by Sex
+
+```{r}
+drug.data %>%
+    ggplot(data = ., aes(y = Oscore, x = Sex, color = Sex)) + 
+    geom_boxplot(outlier.colour = "black", notch = TRUE) +
+    ggtitle("O-Score by Sex") +
+    theme_fivethirtyeight() +
+    theme(legend.position="none")
+```
+
+### C-Score by Sex
+
+```{r}
+drug.data %>%
+    ggplot(data = ., aes(y = Cscore, x = Sex, color = Sex)) + 
+    geom_boxplot(outlier.colour = "black", notch = TRUE) +
+    ggtitle("C-Score by Sex") +
+    theme_fivethirtyeight() +
+    theme(legend.position="none")
+```
+
+row 
+-----------------------------------------------------------------------
+
+O-Score and C-Score by Age Group
+======================================
+
+Inputs {.sidebar}
+------------------------------------
+
+```{r}
+inputPanel(
+  
+  selectInput(inputId = "Age", # the input label that will be passed to the output
+              label = "Select The Age Group(s)", # the name that will appear above the drop down
+              choices = unique(drug.data$Age), # the options to choose from
+              selected = "18-24", # The default value
+              multiple = TRUE) # If you want to enable user to have multiple selections, make this TRUE
+)
+```
+
+
+Row 
+-----------------------------------
+
+### O-Score by Age
+
+```{r}
+## Need 'renderPlotly' for interactive plotly outputs
+
+renderPlotly({
+  
+  drug.data %>% 
+    filter(Sex == "male") %>% 
+    dplyr::filter(Age %in% input$Age) %>% # For multiselects, you need to replace == with %in%
+    plot_ly(data = ., x = ~Age, y = ~Oscore, type = "box")
+  
+})
+```
+
+Row 
+-----------------------------------
+
+### C-Score by Age
+
+```{r}
+## Need 'renderPlotly' for interactive plotly outputs.
+
+renderPlotly({
+  
+  drug.data %>% 
+    filter(Sex == "male") %>% 
+    dplyr::filter(Age %in% input$Age) %>% # For multiselects, you need to replace == with %in%
+    plot_ly(data = ., x = ~Age, y = ~Cscore, type = "box")
+  
+})
+```
+
+row
+-----------------------------------
+
+
+
+
